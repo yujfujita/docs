@@ -1,0 +1,24 @@
+## Convert DOCX to EPUB
+pandoc --extract-media=. -s file.docx --wrap=none --reference-links -t epub -o file.epub
+
+## Unzip EPUB into separate chapters
+for epub in *.epub
+do
+DIR=`echo $epub | sed 's/.epub//'`
+unzip -d $DIR ${epub}
+cd $DIR/EPUB/text/
+for chapter in *.xhtml
+  do
+  OUTPUT=`echo $chapter | sed 's/.xhtml//'`
+  pandoc -f html -t gfm -o $OUTPUT.mdx ${chapter}
+  done
+rm *.xhtml
+mv *.mdx ../../
+cd .. # now in EPUB
+mv media ../../images
+cd .. # now in DIR
+rm mimetype
+rm -rf META-INF
+rm -rf EPUB
+cd .. #back to were we started
+done
